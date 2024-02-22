@@ -9,13 +9,13 @@ anchor_left = 0.5
 anchor_top = 1.0
 anchor_right = 0.5
 anchor_bottom = 1.0
-margin_left = -199.0
-margin_top = -133.0
-margin_right = 199.0
+offset_left = -199.0
+offset_top = -133.0
+offset_right = 199.0
 
 [node name="RichTextLabel" type="RichTextLabel" parent="Panel"]
-margin_left = 149.0
-margin_top = 20.0
-margin_right = 189.0
-margin_bottom = 60.0
+offset_left = 149.0
+offset_top = 20.0
+offset_right = 189.0
+offset_bottom = 60.0
 text = "hello"

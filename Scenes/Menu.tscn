@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Fonts/new_dynamicfont.tres" type="FontFile" id=1]
+[ext_resource path="res://Scripts/Menu.cs" type="Script" id=2]
+
+[node name="Menu" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.337
+anchor_top = 0.281
+anchor_right = 0.376
+anchor_bottom = 0.35
+offset_left = -63.488
+offset_top = -63.0
+offset_right = -23.488
+offset_bottom = -23.0
+script = ExtResource( 2 )
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+offset_right = 376.0
+offset_bottom = 138.0
+theme_override_fonts/font = ExtResource( 1 )
+text = "estart"
+
+[node name="Button2" type="Button" parent="VBoxContainer"]
+offset_top = 142.0
+offset_right = 376.0
+offset_bottom = 280.0
+theme_override_fonts/font = ExtResource( 1 )
+text = "setn hs"
+
+[connection signal="button_down" from="VBoxContainer/Button" to="VBoxContainer" method="onStart"]
+[connection signal="button_up" from="VBoxContainer/Button2" to="VBoxContainer" method="onSettings"]

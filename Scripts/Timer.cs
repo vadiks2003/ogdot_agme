@@ -16,11 +16,9 @@ timer.StartCountDown();
 timer.AddEvent(()=>{stuff}, 5)
 timer.SortTimes();
 
-additionally if you want to switch to lazy mode feel free to Timer.SetMode(Mode.Lazy)
-
 TODO: find something better than List to use. linked list?
 */
-public class Timer
+public partial class Timer
 {
     struct TimeEvent{
         public Callback s_callback;
@@ -33,18 +31,13 @@ public class Timer
         public double interval;
     }
 
-    public enum Mode{
-        Optimized,
-        Lazy
-    }
     double startTime;
-    Mode mode;
 
     public delegate void Callback();
     
     List<TimeEvent> _events;
     List<TimeEventLooped> _loopedEvents;
-     // insert to the update function
+
     public Timer(){
         _events = new List<TimeEvent>();
         _loopedEvents = new List<TimeEventLooped>();
@@ -59,22 +52,29 @@ public class Timer
         _events.Add(timeevent);
     }
 
-    public void AddLoopedEvent(Callback callback, double duration){
+    public void AddLoopedEvent(Callback callback, double interval, double starttime = 0){
         TimeEventLooped timeevent;
         timeevent.s_callback = callback;
 
-        timeevent.whentime = duration;
-        timeevent.interval = duration;
+        timeevent.whentime = interval;
+        if(starttime != 0){
+            timeevent.whentime = starttime;
+        }
+        timeevent.interval = interval;
         _loopedEvents.Add(timeevent);
     }
     public void RemoveAllLoopedElements(){
         _loopedEvents = new List<TimeEventLooped>();
+    }
+     public void RemoveAllNormalElements(){
+        List<TimeEvent> _events = new List<TimeEvent>();
     }
 
     // call manually right after adding all the AddEvents()
     // maybe i should change List to a fucking std::vector or something wtf
     public void SortTimes()
     {
+        // cant use Array.Sort on lists of structs ?
         TimeEvent[] eventsArr = _events.ToArray(); 
 
         // since its stupid idea to remove [0] in array and smarter to remove last one, i chose to sort them from bigger to smaller  and check accordingly
@@ -84,7 +84,10 @@ public class Timer
             _events[i] = eventsArr[i];
         }
     }
+
+    // add to your update function
     // checks only last event and removes it from _events if its callback function was called.
+    // maybe make a loopedTimer class instead of checking both in single check function. that would require basically creating similar class but with few changes
     public void Check(){
         // need to have _events SortTimes() for it to work properly
         if(_events.Count > 0 && Time.GetUnixTimeFromSystem() - startTime >= _events[_events.Count-1].whentime)
@@ -93,12 +96,16 @@ public class Timer
             _events.Remove(_events[_events.Count-1]);
         }
 
+        // considering there won't be much looped elements, i've written simple one for now
+        // optimized idea: sort them by whentime with added interval and do similar thing as above with sorttimes :skull:
         if(_loopedEvents.Count > 0){
             for(int i = 0; i < _loopedEvents.Count; i++){
                 if(Time.GetUnixTimeFromSystem() - startTime >= _loopedEvents[i].whentime){
                     _loopedEvents[i].s_callback();
 
                     double nextTime = _loopedEvents[i].whentime + _loopedEvents[i].interval;
+
+                    // can't modify just single thing so i make new one and reassign
                     TimeEventLooped tel;
                     tel.s_callback = _loopedEvents[i].s_callback;
                     tel.interval = _loopedEvents[i].interval;

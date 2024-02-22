@@ -1,15 +1,18 @@
 using Godot;
 using System;
 
-public class KeyManager
+public partial class KeyManager
 {
     private static int KeyAmount = 0;
     static int MAX_KEYS_IN_LIST = 32;
     struct Key{
         public bool exists;
     }
-
-    Key[] keylist = new Key[MAX_KEYS_IN_LIST];
+    Key[] keylist;
+    public KeyManager(){
+        keylist = new Key[MAX_KEYS_IN_LIST];
+    }
+    
     public void CreateKey(int id)
     {
         keylist[KeyAmount].exists = true;

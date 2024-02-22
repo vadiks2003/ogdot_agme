@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://Scripts/settings.cs" type="Script" id=1]
+[ext_resource path="res://Fonts/new_dynamicfont.tres" type="FontFile" id=2]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_left = 205.0
+offset_top = 54.0
+offset_right = 841.0
+offset_bottom = 491.0
+script = ExtResource( 1 )
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+offset_right = 636.0
+offset_bottom = 138.0
+theme_override_fonts/font = ExtResource( 2 )
+text = "BACK"
+
+[node name="TextEdit" type="TextEdit" parent="VBoxContainer"]
+offset_top = 142.0
+offset_right = 636.0
+offset_bottom = 142.0
+theme_override_fonts/font = ExtResource( 2 )
+text = "fps limit"
+
+[node name="HSlider" type="HSlider" parent="VBoxContainer"]
+offset_top = 146.0
+offset_right = 636.0
+offset_bottom = 162.0
+min_value = 30.0
+max_value = 160.0
+value = 60.0
+
+[connection signal="button_up" from="VBoxContainer/Button" to="VBoxContainer" method="onBack"]

@@ -8,7 +8,7 @@ public partial class Door : StaticBody2D
 	int id = 0;
 	
 	bool hasEntered = false;
-	public void OnDoorEntered(KinematicBody2D body){
+	public void OnDoorEntered(Node2D body){
 		if(body.Name == "Player")
 		{
 			CheckKey();

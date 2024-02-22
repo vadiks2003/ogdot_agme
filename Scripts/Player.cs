@@ -1,6 +1,6 @@
 using System.IO.Pipes;
 using Godot;
-public class Player : KinematicBody2D
+public partial class Player : CharacterBody2D
 {
     AudioStreamPlayer2D[] audiostreams;
     Movement movement = new Movement();
@@ -20,10 +20,11 @@ public class Player : KinematicBody2D
         audiostreams[2] = GetNode<AudioStreamPlayer2D>("Dodge");
         audiostreams[3] = GetNode<AudioStreamPlayer2D>("ParryAdded");
         parry.SetAudio(audiostreams[1], audiostreams[3]);
+        parry.player = this;
         camera = GetNode<Camera>("../Camera2D");
 
     }
-    public override void _PhysicsProcess(float delta)
+    public override void _PhysicsProcess(double delta)
     {
         ProcessMovement();
         ProcessParry();
@@ -33,29 +34,48 @@ public class Player : KinematicBody2D
         LookAt(GetGlobalMousePosition());
         movement.GetInput();
         // originally on their website it says velocity = move_and_slide(velocity). move and slide returns velocity. i dont know why but ok
-        if(AllowedToWalk) movement.velocity = MoveAndSlide(movement.velocity);
+        if(AllowedToWalk) MoveAndCollide(movement.velocity);
     }
 
     void ProcessParry(){
         parry.doParry();
     }
-
+public enum DamageType{
+    Dodged,
+    Iframed,
+    Parried,
+    Hit,
+    DashParried
+}
 // null question mark is questionable but i am too lazy to check now
-    public bool Damage(int health, Vector2? source = null)
+    public DamageType Damage(int health, Vector2? source = null, bool pushback = true, bool canDodgeThrough = true, bool canParry = true, bool isIFrameable = true, bool hasToParryWhileDodging = false)
     {
-        if(lastTimeHit + iframes >= Time.GetUnixTimeFromSystem()) return false;
         if(source == null) source = Vector2.Zero;
-        if(!parry.GetHitBitch()) return false;
+        if(canParry) if(!parry.GetHitBitch(source.Value)){
+            if(hasToParryWhileDodging && movement.isDashing)
+            {
+                return DamageType.DashParried;
+            }
+            return DamageType.Parried;
+        }
+        
+        if(canDodgeThrough) 
         if(movement.isDashing) {
             audiostreams[2].Play();
-            return false;
+            return DamageType.Dodged;
         };
-        this.health -= health;   
-        camera.ShakeCamera(source.Value, health);
-        movement.pushVelocity = -(source.Value - Position) * health * 10;
+        
+        if(isIFrameable) if(lastTimeHit + iframes >= Time.GetUnixTimeFromSystem()) return DamageType.Iframed;
+        
+        this.health -= health;
+        if(pushback)
+        {
+            camera.ShakeCamera(source.Value, health);
+            movement.pushVelocity = -(source.Value - Position) * 10 * health;
+        }
         audiostreams[0].Play();
         lastTimeHit = Time.GetUnixTimeFromSystem();
-        return true;
+        return DamageType.Hit;
     }
 
     public override void _Input(InputEvent @event)
